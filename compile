@@ -1,0 +1,69 @@
+#include <iostream>
+#include <cstdlib> // convert char* to double
+#include <iomanip> // setprecision of printed double
+
+using namespace std;
+
+// Checks whether parsed double is valid
+bool isValidDouble(double x, char* y) {
+    return (x != 0.0 || (x == 0.0 && *y == '0'));
+}
+
+void printDouble(double x) {
+    std::cout << x << std::setprecision(10) << endl;
+}
+
+double max(double a, double b) {
+    return (a > b) ? a : b;
+}
+
+double min(double a, double b) {
+    return (a < b) ? a : b;
+}
+
+int main(int argc, char* argv[]) {
+    // Note: double has 15 digits and float only 7 digits
+
+    if (argc != 3) {
+        std::cerr << "Program takes 2 arguments [threshold] [limit]" << std::endl;
+        return 1;
+    }
+
+    // Assumption: 0 <= threshold <= 1,000,000,000.0
+    // Assumption: 0 <= limit <= 1,000,000,000.0
+    double threshold = std::strtod(argv[1], nullptr);
+    double limit = std::strtod(argv[2], nullptr);
+
+    if (!isValidDouble(threshold, argv[1]) || !isValidDouble(limit, argv[2])) {
+        std::cerr << "Invalid threshold or limit provided. Must be a decimal number." << std::endl;
+        return 1;
+    }
+
+    double cumulative_sum = 0.0;
+
+    double x;
+    while(std::cin >> x) {
+        // Assumptions: 0 <= x <= 1,000,000,000.0
+        x = max(0, x - threshold);
+        cumulative_sum += x;
+        x -= max(0, cumulative_sum - limit);
+        cumulative_sum = min(limit, cumulative_sum);
+        /*
+        Alternative for better legibility
+        if (x < threshold) {
+            x = 0;
+        } else {
+            x -= threshold;
+            cumulative_sum += x;
+            if (cumulative_sum > limit) {
+                x -= (cumulative_sum - limit);
+                cumulative_sum = limit;
+            }
+        }
+        */
+        printDouble(x);
+    }
+    printDouble(cumulative_sum);
+
+    return 0;
+}
